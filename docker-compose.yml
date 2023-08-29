@@ -1,0 +1,95 @@
+version: "3.8"
+
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    tty: true
+    volumes:
+      - ./:/var/www
+      - ./container/default.conf:/etc/nginx/conf.d/default.conf
+      - ./container/certbot/conf:/etc/letsencrypt
+      - ./container/certbot/www:/var/www/certbot
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    depends_on:
+      - php
+    networks:
+      - laravel
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./container/certbot/conf:/etc/letsencrypt
+      - ./container/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  php:
+    build:
+      context: .
+      dockerfile: ./container/Dockerfile
+    env_file: ./container/.env.docker
+    working_dir: /var/www
+    tty: true
+    volumes:
+      - ./:/var/www
+      - ./container/php.ini:/usr/local/etc/php/conf.d/php.ini
+      - ./container/docker-entrypoint.sh:/var/www/docker-entrypoint.sh
+    # entrypoint: /var/www/docker-entrypoint.sh
+    # command:
+    #   - "chmod +x /var/www/docker-entrypoint.sh"
+    expose:
+      - "9000"
+    depends_on:
+      - redis
+      - db
+    networks:
+      - laravel
+
+  redis:
+    image: redis:latest
+    networks:
+      - laravel
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: kampungkb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Persetan45
+    volumes:
+      - ./container/db/data:/var/lib/postgresql/data
+      - ./container/db/genesis.sql:/docker-entrypoint-initdb.d/genesis.sql
+      - ./container/db/kampung.sql:/docker-entrypoint-initdb.d/kampung.sql
+      - ./database/files:/var/www/database/files
+    networks:
+      - laravel
+    ports:
+      - "5432:5432"
+
+  dblog:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: kampunglog
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./container/dblog/data:/var/lib/postgresql/data
+    networks:
+      - laravel
+
+
+networks:
+  laravel:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
+
+    # tty: true
+    # ports:
+    # - "6379:6379"
+
+

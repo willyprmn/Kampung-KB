@@ -1,0 +1,61 @@
+stages:
+  - deploy
+  - cleanup
+
+before_script:
+  - 'which ssh-agent || ( apk update && apk add openssh-client )'
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY" | ssh-add -
+  - mkdir -p ~/.ssh
+  - ssh-keyscan -H 188.166.249.90 >> ~/.ssh/known_hosts
+
+deploy_staging:
+  stage: deploy
+  environment:
+    name: staging
+    url: http://kpkb.devmaster.id:8880
+  only:
+    refs:
+      - master
+  script:
+    - ssh -o StrictHostKeyChecking=no devmaster@188.166.249.90 "cd /home/devmaster/kpkb-2021 && git config --global user.email 'stevanadjie@gmail.com' && git config --global user.name 'marsflow' && exit"
+    - ssh -o StrictHostKeyChecking=no devmaster@188.166.249.90 "cd /home/devmaster/kpkb-2021 && git fetch && git checkout $CI_COMMIT_REF_NAME && git pull origin $CI_COMMIT_REF_NAME && exit"
+
+autoload_optimize:
+  stage: cleanup
+  environment:
+    name: staging
+  only:
+    refs:
+      - master
+  script:
+    - ssh -o StrictHostKeyChecking=no devmaster@188.166.249.90 "cd /home/devmaster/kpkb-2021 && docker-compose exec -T php composer dump-autoload && exit"
+    - ssh -o StrictHostKeyChecking=no devmaster@188.166.249.90 "cd /home/devmaster/kpkb-2021 && docker-compose exec -T php php artisan optimize && exit"
+
+install_package:
+  stage: deploy
+  environment:
+    name: staging
+    url: http://kpkb.devmaster.id:8880
+  only:
+    refs:
+      - master
+  script:
+    - ssh -o StrictHostKeyChecking=no devmaster@188.166.249.90 "cd /home/devmaster/kpkb-2021 && docker-compose exec -T php composer install && exit"
+    - ssh -o StrictHostKeyChecking=no devmaster@188.166.249.90 "cd /home/devmaster/kpkb-2021 && docker-compose exec -T php yarn && exit"
+    - ssh -vvv -o StrictHostKeyChecking=no devmaster@188.166.249.90 "cd /home/devmaster/kpkb-2021 && docker-compose exec -T php yarn run production && exit"
+  when: manual
+  # test
+
+database_migration:
+  stage: deploy
+  only:
+    refs:
+      - master
+  environment:
+    name: staging
+    url: http://kpkb.devmaster.id:8880
+  script:
+    - ssh -o StrictHostKeyChecking=no devmaster@188.166.249.90 "cd /home/devmaster/kpkb-2021 && docker-compose exec -T php php artisan migrate:refresh --seed && exit"
+  when: manual
+

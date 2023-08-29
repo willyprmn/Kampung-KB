@@ -1,0 +1,70 @@
+#map {
+    height: 20rem;
+    width: 100%;
+}
+.infoWindow {
+    background-color: red;
+    border-radius: 50%;
+    color: #999999;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+#content {
+    margin-bottom: 10px;
+    border-radius: 10px 10px 10px 0;
+}
+#content .iw-title {
+    font-family: 'Open Sans Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    padding: 10px;
+    background-color: #48b5e9;
+    color: white;
+    margin-left: -100px;
+    margin-right: -100px;
+    overflow: visible;
+    border-radius: 10px 10px 10px 0;
+}
+#content .iw-content {
+    font-size: 13px;
+    line-height: 18px;
+    font-weight: 400;
+    margin-right: 1px;
+    padding: 15px 5px 20px 15px;
+    max-height: 140px;
+    overflow-y: visible;
+    overflow-x: visible;
+;
+}
+.iw-content img {
+    float: right;
+    margin: 0 5px 5px 10px;
+}
+
+/*.gm-style-iw {*/
+    /*border: 1px solid rgba(178, 178, 178, 1.0);*/
+    /*border-radius: 10px 10px 10px 2px;*/
+/*}*/
+/*CSS for custom Marker*/
+/*#customMarker img{*/
+    /*text-align: center !important;*/
+    /*position: relative;*/
+    /*background: #007fb2;*/
+    /*-webkit-border-radius: 10px ;*/
+    /*-moz-border-radius: 10px ;*/
+    /*border-radius: 10px;*/
+    /*width: 34px;*/
+    /*height: 28px !important;*/
+/*}*/
+
+/*#customMarker:after img{*/
+    /*content: "" !important;*/
+    /*position: absolute !important;*/
+    /*top: 28px !important;*/
+    /*left: 9px !important;*/
+    /*z-index: 1 !important;*/
+    /*border-left: 7px solid transparent !important;*/
+    /*border-right: 7px solid transparent !important;*/
+    /*border-top: 7px solid #007fb2 !important;*/
+/*}*/

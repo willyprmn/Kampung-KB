@@ -1,0 +1,24 @@
+{
+    "name": "marsflow/cached-datatable",
+    "description": "Yajra datatable with cache",
+    "authors": [
+        {
+            "name": "Stevan Aji",
+            "email": "stevanadjie@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "marsflow\\cached-datatable\\CachedDataTableServiceProvider"
+            ]
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Marsflow\\CachedDataTable\\": "src/"
+        }
+    },
+    "require": {}
+}
